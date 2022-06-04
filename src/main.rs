@@ -9,6 +9,6 @@ const BASES_COUNT: u32 = 3;
 
 fn main() {
     let mut world = World::new(WORLD_SIZE);
-    world.spawn_bases(BASES_COUNT);
+    world.initialize(BASES_COUNT);
     world.print();
 }

@@ -4,6 +4,8 @@ use std::fmt::{self, Display, Formatter};
 pub enum Cell {
     Empty,
     Base,
+    Tree,
+    Worker,
 }
 
 impl Cell {
@@ -11,6 +13,8 @@ impl Cell {
         match self {
             Cell::Empty => ' ',
             Cell::Base => 'B',
+            Cell::Tree => 'T',
+            Cell::Worker => 'W',
         }
     }
 }
