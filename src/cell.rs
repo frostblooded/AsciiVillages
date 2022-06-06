@@ -1,26 +1,20 @@
-use std::fmt::{self, Display, Formatter};
+use super::cell_type::CellType;
+use crate::engine::game_object::GameObject;
+use crate::position::Position;
 
-#[derive(Clone, PartialEq, Eq)]
-pub enum Cell {
-    Empty,
-    Base,
-    Tree,
-    Worker,
+#[derive(Clone)]
+pub struct Cell {
+    pub position: Position,
+    pub cell_type: CellType,
 }
 
 impl Cell {
-    fn to_char(&self) -> char {
-        match self {
-            Cell::Empty => ' ',
-            Cell::Base => 'B',
-            Cell::Tree => 'T',
-            Cell::Worker => 'W',
+    pub fn new(position: Position, cell_type: CellType) -> Self {
+        Cell {
+            position,
+            cell_type,
         }
     }
 }
 
-impl Display for Cell {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}", self.to_char())
-    }
-}
+impl GameObject for Cell {}
