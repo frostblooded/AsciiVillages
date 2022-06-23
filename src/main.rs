@@ -1,7 +1,8 @@
-mod cell;
-mod cell_type;
+mod base;
 mod engine;
 mod position;
+mod tree;
+mod worker;
 mod world;
 
 use std::time::Duration;

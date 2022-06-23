@@ -1,4 +1,3 @@
-use crate::engine::game_object::GameObject;
 use crate::world::World;
 
 pub struct Game {
@@ -16,15 +15,9 @@ impl Game {
     }
 
     pub fn update(&mut self) {
-        // Create a copy of the grid so that we can keep the old grid
-        // while we update the cells.
-        let new_grid = self.world.grid.clone();
-
-        for cell in new_grid.iter().flatten() {
-            cell.update(&mut self.world);
+        for object in self.world.objects.iter_mut() {
+            // object.update(&mut self.world)
         }
-
-        self.world.grid = new_grid;
     }
 
     pub fn draw(&self) {
