@@ -5,8 +5,7 @@ use rand::prelude::IteratorRandom;
 use rand::Rng;
 
 pub struct World {
-    grid: Vec<Vec<Cell>>,
-    grid_size: usize,
+    pub grid: Vec<Vec<Cell>>,
 }
 
 impl World {
@@ -21,7 +20,7 @@ impl World {
             }
         }
 
-        World { grid, grid_size }
+        World { grid }
     }
 
     pub fn print(&self) {
@@ -89,8 +88,8 @@ impl World {
     }
 
     fn spawn_trees(&mut self) {
-        for y in 0..self.grid_size {
-            for x in 0..self.grid_size {
+        for y in 0..self.grid.len() {
+            for x in 0..self.grid.len() {
                 let position = Position::new(x, y);
 
                 if self.is_cell_good_for_tree(position) {
@@ -103,8 +102,8 @@ impl World {
     fn get_random_position(&self) -> Position {
         let mut rng = rand::thread_rng();
         Position::new(
-            rng.gen_range(0..self.grid_size),
-            rng.gen_range(0..self.grid_size),
+            rng.gen_range(0..self.grid.len()),
+            rng.gen_range(0..self.grid.len()),
         )
     }
 

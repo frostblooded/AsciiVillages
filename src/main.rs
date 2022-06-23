@@ -4,12 +4,17 @@ mod engine;
 mod position;
 mod world;
 
-use world::World;
+use std::time::Duration;
 
-const WORLD_SIZE: usize = 10;
+use engine::game::Game;
 
 fn main() {
-    let mut world = World::new(WORLD_SIZE);
-    world.initialize();
-    world.print();
+    let mut game = Game::new();
+
+    loop {
+        game.update();
+        game.draw();
+
+        std::thread::sleep(Duration::from_secs(1));
+    }
 }
