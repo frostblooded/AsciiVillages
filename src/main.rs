@@ -4,10 +4,13 @@ mod position_component;
 mod tree_component;
 mod worker_component;
 
+use std::time::Duration;
+
 use base_component::BaseComponent;
 use bevy::prelude::*;
 use drawable_component::DrawableComponent;
-use position_component::{get_distance, Position, PositionComponent};
+use itertools::Itertools;
+use position_component::{are_positions_adjacent, Position, PositionComponent};
 use tree_component::TreeComponent;
 
 use rand::{prelude::IteratorRandom, Rng};
@@ -60,19 +63,17 @@ fn spawn_world_system(mut commands: Commands) {
         .insert(PositionComponent::new(base_position))
         .insert(DrawableComponent::new('B'));
 
-    for y in 0..GRID_SIZE {
-        for x in 0..GRID_SIZE {
-            let position = Position::new(x, y);
-
-            if get_distance(position, base_position) > 1 {
-                commands
-                    .spawn()
-                    .insert(TreeComponent)
-                    .insert(PositionComponent::new(position))
-                    .insert(DrawableComponent::new('T'));
-            }
-        }
-    }
+    (0..GRID_SIZE)
+        .cartesian_product(0..GRID_SIZE)
+        .map(|(x, y)| Position::new(x, y))
+        .filter(|&pos| !are_positions_adjacent(pos, base_position))
+        .for_each(|position| {
+            commands
+                .spawn()
+                .insert(TreeComponent)
+                .insert(PositionComponent::new(position))
+                .insert(DrawableComponent::new('T'));
+        });
 
     let worker_positions: Vec<Position> = get_adjacent_positions(base_position)
         .into_iter()
@@ -96,6 +97,9 @@ fn draw_system(query: Query<(&DrawableComponent, &PositionComponent)>) {
         grid_draw_cache[index] = drawable_component.symbol;
     }
 
+    println!();
+    println!();
+
     for y in 0..GRID_SIZE {
         for x in 0..GRID_SIZE {
             let index: usize = (y * GRID_SIZE + x) as usize;
@@ -106,9 +110,37 @@ fn draw_system(query: Query<(&DrawableComponent, &PositionComponent)>) {
     }
 }
 
+fn worker_chop_system(
+    mut commands: Commands,
+    workers_query: Query<&PositionComponent, With<WorkerComponent>>,
+    trees_query: Query<(Entity, &PositionComponent), With<TreeComponent>>,
+) {
+    for worker_pos in workers_query.iter() {
+        for (tree_entity, tree_pos) in trees_query.iter() {
+            if are_positions_adjacent(worker_pos.position, tree_pos.position) {
+                commands.entity(tree_entity).despawn();
+                break;
+            }
+        }
+    }
+}
+
+fn runner(mut app: App) {
+    loop {
+        std::thread::sleep(Duration::from_secs(1));
+        app.update();
+    }
+}
+
 fn main() {
     let mut app: App = App::new();
+    app.add_plugins(MinimalPlugins);
+    app.set_runner(runner);
+
     app.add_startup_system(spawn_world_system);
-    app.add_system(draw_system);
+    app.add_startup_system_to_stage(StartupStage::PostStartup, draw_system);
+    app.add_system(worker_chop_system);
+    app.add_system_to_stage(CoreStage::PostUpdate, draw_system);
+
     app.run();
 }

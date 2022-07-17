@@ -23,19 +23,9 @@ impl PositionComponent {
     }
 }
 
-pub fn get_length(position: Position) -> u32 {
-    ((position.x * position.x + position.y * position.y) as f32)
-        .sqrt()
-        .floor() as u32
-}
+pub fn are_positions_adjacent(position1: Position, position2: Position) -> bool {
+    let x_dist = (position1.x as i32 - position2.x as i32).unsigned_abs();
+    let y_dist = (position1.y as i32 - position2.y as i32).unsigned_abs();
 
-pub fn abs_substract_positions(position1: Position, position2: Position) -> Position {
-    Position::new(
-        (position1.x as i32 - position2.x as i32).unsigned_abs(),
-        (position1.y as i32 - position2.y as i32).unsigned_abs(),
-    )
-}
-
-pub fn get_distance(position1: Position, position2: Position) -> u32 {
-    get_length(abs_substract_positions(position1, position2))
+    x_dist <= 1 && y_dist <= 1
 }
